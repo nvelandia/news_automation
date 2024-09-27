@@ -1,6 +1,6 @@
 // @ts-ignore
-const { getS3Info } = require('./S3');
-const { countries } = require('./channels');
+const { getS3Info } = require('../../utils/S3');
+const { countries } = require('../../utils/channels');
 const AWS = require('aws-sdk');
 
 interface Icountry {
