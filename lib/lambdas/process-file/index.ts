@@ -27,14 +27,12 @@ export const handler = async (event: any) => {
 
   console.log('tournament', tournament);
 
-  // Definir tiempos de espera *****
-
   // Parámetros para iniciar la Step Function
   const params = {
     stateMachineArn: process.env.STEP_FUNCTION_ARN, // ARN de la Step Function
     input: JSON.stringify({
-      waitTime1: 10,
-      waitTime2: 5,
+      waitTime1: calculateWaitTimes(matchInfo.match_start, 5),
+      waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
     }),
   };
 
@@ -65,4 +63,18 @@ function validateCompetition(torneo: string) {
   } else {
     return false;
   }
+}
+
+function calculateWaitTimes(match_start: string, time: number) {
+  const originalDate = new Date(match_start);
+
+  const hoursBefore = new Date(originalDate);
+  hoursBefore.setHours(originalDate.getHours() - time);
+
+  const targetDate = new Date(hoursBefore);
+  const timestamp = targetDate.getTime();
+
+  console.log(match_start, ` ${time} `, hoursBefore, ' ', timestamp);
+
+  return hoursBefore;
 }

@@ -35,7 +35,7 @@ export class NewsAutomationStack extends cdk.Stack {
 
     // Step 1
     const waitTime1 = new sfn.Wait(this, 'Wait 24 before', {
-      time: sfn.WaitTime.secondsPath('$.waitTime1'),
+      time: sfn.WaitTime.timestampPath('$.waitTime1'),
     });
     // Step 2
     const oneLambdaTask = new tasks.LambdaInvoke(this, 'Invoke oneLambda', {
@@ -44,7 +44,7 @@ export class NewsAutomationStack extends cdk.Stack {
     });
     // Step 3
     const waitTime2 = new sfn.Wait(this, 'Wait 1 before', {
-      time: sfn.WaitTime.secondsPath('$.waitTime2'),
+      time: sfn.WaitTime.timestampPath('$.waitTime2'),
     });
     // Step 4
     const twoLambdaTask = new tasks.LambdaInvoke(this, 'Invoke twoLambda', {
