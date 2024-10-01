@@ -1,6 +1,6 @@
 // @ts-ignore
-const { getS3Info } = require('../../utils/S3');
-const { countries } = require('../../utils/channels');
+const { getS3Info } = require('./utils/S3');
+const { countries } = require('./utils/channels');
 const AWS = require('aws-sdk');
 
 interface Icountry {
@@ -19,20 +19,22 @@ export const handler = async (event: any) => {
     return;
   }
 
-  // let tournament = validateCompetition(matchInfo?.match_channel);
+  let tournament = validateCompetition(matchInfo?.match_channel);
 
-  // if (!tournament) {
-  //   return;
-  // }
+  if (!tournament) {
+    return;
+  }
 
-  // console.log('tournament', tournament);
+  console.log('tournament', tournament);
+
+  // Definir tiempos de espera *****
 
   // Parámetros para iniciar la Step Function
   const params = {
     stateMachineArn: process.env.STEP_FUNCTION_ARN, // ARN de la Step Function
     input: JSON.stringify({
-      waitTime1: 10, // Puedes ajustar el tiempo de espera según sea necesario
-      waitTime2: 5, // Puedes ajustar el tiempo de espera según sea necesario
+      waitTime1: 10,
+      waitTime2: 5,
     }),
   };
 
