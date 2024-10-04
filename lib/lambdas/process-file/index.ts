@@ -30,6 +30,7 @@ export const handler = async (event: any) => {
     stateMachineArn: process.env.STEP_FUNCTION_ARN, // ARN de la Step Function
     input: JSON.stringify({
       match_id: matchInfo.match_id,
+      match_start: matchInfo.match_start,
       waitTime1: calculateWaitTimes(matchInfo.match_start, 25),
       waitTime2: calculateWaitTimes(matchInfo.match_start, 26),
       tournament: tournament,
