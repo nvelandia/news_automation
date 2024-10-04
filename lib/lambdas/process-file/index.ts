@@ -1,6 +1,6 @@
 // @ts-ignore
 const { getS3Info } = require('./utils/S3');
-const { countries } = require('./utils/channels');
+const { tournament } = require('./utils/channels');
 const AWS = require('aws-sdk');
 
 interface Icountry {
@@ -25,14 +25,14 @@ export const handler = async (event: any) => {
     return;
   }
 
-  console.log('tournament', tournament);
-
   // Parámetros para iniciar la Step Function
   const params = {
     stateMachineArn: process.env.STEP_FUNCTION_ARN, // ARN de la Step Function
     input: JSON.stringify({
-      waitTime1: calculateWaitTimes(matchInfo.match_start, 5),
-      waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
+      match_id: matchInfo.match_id,
+      waitTime1: calculateWaitTimes(matchInfo.match_start, 25),
+      waitTime2: calculateWaitTimes(matchInfo.match_start, 26),
+      tournament: tournament,
     }),
   };
 
@@ -54,7 +54,7 @@ export const handler = async (event: any) => {
 };
 
 function validateCompetition(torneo: string) {
-  const result = countries.find((country: Icountry) =>
+  const result = tournament.find((country: Icountry) =>
     country.name.toLowerCase().includes(torneo.toLowerCase())
   );
 
@@ -66,6 +66,7 @@ function validateCompetition(torneo: string) {
 }
 
 function calculateWaitTimes(match_start: string, time: number) {
+  return `2024-10-02T18:${time}:00.000Z`;
   const originalDate = new Date(match_start);
 
   const hoursBefore = new Date(originalDate);

@@ -6,6 +6,7 @@ import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as path from 'path';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 export class NewsAutomationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -15,12 +16,44 @@ export class NewsAutomationStack extends cdk.Stack {
     const bucketName: string = process.env.BUCKET || 'dev';
     const bucket = s3.Bucket.fromBucketName(this, 'ExistingBucket', bucketName);
 
+    const securityGroupId = process.env.SECURITY_GROUP!;
+    const subnetId1 = process.env.SUBNET_ID1!;
+    const subnetId2 = process.env.SUBNET_ID2!;
+
+    const vpc = ec2.Vpc.fromVpcAttributes(this, 'ImportedVpc', {
+      vpcId: process.env.VPC_ID!,
+      availabilityZones: ['us-east-1a', 'us-east-1b'], // Availability Zones
+    });
+
+    const securityGroup = ec2.SecurityGroup.fromSecurityGroupId(
+      this,
+      'ImportedSecurityGroup',
+      securityGroupId // Reemplaza con el ID de tu Security Group
+    );
+
+    // Import the subnets
+    const subnet1 = ec2.Subnet.fromSubnetId(this, 'Subnet1', subnetId1);
+    const subnet2 = ec2.Subnet.fromSubnetId(this, 'Subnet2', subnetId2);
+
     const oneLambda = new lambda.Function(this, 'oneLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset(
         path.join(__dirname, '..', 'lambdas/stepOneCreateNote')
       ),
+      vpc: vpc,
+      securityGroups: [securityGroup],
+      vpcSubnets: {
+        subnets: [subnet1, subnet2], // Pass the imported subnets here
+      },
+      environment: {
+        TABLE_CONTENIDO: process.env.TABLE_CONTENIDO || '',
+        TABLE_NOTA: process.env.TABLE_NOTA || '',
+        MYSQL_HOST: process.env.MYSQL_HOST || '',
+        MYSQL_USER: process.env.MYSQL_USER || '',
+        MYSQL_PASSWORD: process.env.MYSQL_PASSWORD || '',
+        MYSQL_DATABASE: process.env.MYSQL_DATABASE || '',
+      },
     });
 
     const twoLambda = new lambda.Function(this, 'twoLambda', {

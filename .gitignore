@@ -1,7 +1,10 @@
 *.js
 
 # Excepción para la carpeta /lib/utils/
-!lib/utils/*.js
+!lib/lambdas/process-file/utils/*.js
+!lib/lambdas/stepOneCreateNote/utils/*.js
+!lib/lambdas/stepTwoPublishNote/utils/*.js
+
 !jest.config.js
 
 *.d.ts
