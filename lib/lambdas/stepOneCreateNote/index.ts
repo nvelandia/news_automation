@@ -21,6 +21,7 @@ export const handler = async (event: any) => {
       console.log('Nuevo Contenido', con_id);
 
       info.article.con_id = con_id;
+      event.con_id = con_id;
 
       console.log('info.article', info.article);
       let tad_nota = await Service.insert('tad_nota', info.article);
@@ -33,10 +34,7 @@ export const handler = async (event: any) => {
 
       // info.match.con_id = con_id;
       // console.log('info.match', info.match);
-      // let updateMatch = await Service.updateMatch(
-      //   info.match,
-      //   _Mam.match.matchId
-      // );
+      // let updateMatch = await Service.updateMatch(info.match, event.match_id);
       // console.log('updateMatch', updateMatch);
 
       ////////////// PUBLICAR CONTENIDO ///////////////////
