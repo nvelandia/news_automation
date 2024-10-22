@@ -10,7 +10,9 @@
   "license": "ISC",
   "types": "./index.d.ts",
   "dependencies": {
-    "moment-timezone": "^0.5.45",
     "mysql2": "^3.11.3"
+  },
+  "devDependencies": {
+    "moment-timezone": "^0.5.46"
   }
 }

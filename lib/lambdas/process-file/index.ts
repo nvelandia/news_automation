@@ -1,3 +1,5 @@
+import { APIGatewayProxyEvent } from 'aws-lambda';
+
 // @ts-ignore
 const { getS3Info } = require('./utils/S3');
 const { tournament } = require('./utils/channels');
@@ -8,7 +10,7 @@ interface Icountry {
   text: string;
 }
 
-export const handler = async (event: any) => {
+export const handler = async (event: APIGatewayProxyEvent) => {
   //
   const stepfunctions = new AWS.StepFunctions();
   let matchInfo = await getS3Info(event);
@@ -31,8 +33,8 @@ export const handler = async (event: any) => {
     input: JSON.stringify({
       match_id: matchInfo.match_id,
       match_start: matchInfo.match_start,
-      waitTime1: calculateWaitTimes(matchInfo.match_start, 25),
-      waitTime2: calculateWaitTimes(matchInfo.match_start, 26),
+      waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
+      waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
       tournament: tournament,
     }),
   };
@@ -67,7 +69,7 @@ function validateCompetition(torneo: string) {
 }
 
 function calculateWaitTimes(match_start: string, time: number) {
-  return `2024-10-02T18:${time}:00.000Z`;
+  // return `2024-10-02T18:${time}:00.000Z`;
   const originalDate = new Date(match_start);
 
   const hoursBefore = new Date(originalDate);
