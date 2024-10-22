@@ -1,7 +1,7 @@
 *.js
 
 # Excepción para la carpeta /lib/utils/
-!lib/lambdas/utils/*.js
+!lib/utils/*.js
 
 
 !jest.config.js
