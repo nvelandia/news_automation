@@ -3,7 +3,8 @@ import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { Runtime, Code } from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as path from 'path';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
@@ -35,12 +36,10 @@ export class NewsAutomationStack extends cdk.Stack {
     const subnet1 = ec2.Subnet.fromSubnetId(this, 'Subnet1', subnetId1);
     const subnet2 = ec2.Subnet.fromSubnetId(this, 'Subnet2', subnetId2);
 
-    const oneLambda = new lambda.Function(this, 'oneLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset(
-        path.join(__dirname, '..', 'lambdas/stepOneCreateNote')
-      ),
+    const oneLambda = new NodejsFunction(this, 'oneLambda', {
+      runtime: Runtime.NODEJS_18_X,
+      handler: 'handler',
+      entry: path.join(__dirname, '..', 'lambdas/stepOneCreateNote.ts'),
       vpc: vpc,
       securityGroups: [securityGroup],
       vpcSubnets: {
@@ -56,12 +55,23 @@ export class NewsAutomationStack extends cdk.Stack {
       },
     });
 
-    const twoLambda = new lambda.Function(this, 'twoLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset(
-        path.join(__dirname, '..', 'lambdas/stepTwoPublishNote')
-      ),
+    const twoLambda = new NodejsFunction(this, 'twoLambda', {
+      runtime: Runtime.NODEJS_18_X,
+      handler: 'handler',
+      entry: path.join(__dirname, '..', 'lambdas/stepTwoPublishNote.ts'),
+      vpc: vpc,
+      securityGroups: [securityGroup],
+      vpcSubnets: {
+        subnets: [subnet1, subnet2], // Pass the imported subnets here
+      },
+      environment: {
+        TABLE_CONTENIDO: process.env.TABLE_CONTENIDO || '',
+        TABLE_NOTA: process.env.TABLE_NOTA || '',
+        MYSQL_HOST: process.env.MYSQL_HOST || '',
+        MYSQL_USER: process.env.MYSQL_USER || '',
+        MYSQL_PASSWORD: process.env.MYSQL_PASSWORD || '',
+        MYSQL_DATABASE: process.env.MYSQL_DATABASE || '',
+      },
     });
 
     // Step Functions ----------
@@ -99,12 +109,10 @@ export class NewsAutomationStack extends cdk.Stack {
     // ----------
 
     // Lambda listenBucket (disparadora de la Step Function)
-    const processFileLambda = new lambda.Function(this, 'LambdaFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset(
-        path.join(__dirname, '..', 'lambdas/process-file')
-      ),
+    const processFileLambda = new NodejsFunction(this, 'LambdaFunction', {
+      runtime: Runtime.NODEJS_18_X,
+      handler: 'handler',
+      entry: path.join(__dirname, '..', 'lambdas/process-file.ts'),
       environment: {
         STEP_FUNCTION_ARN: stepFunction.stateMachineArn,
       },

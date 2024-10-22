@@ -1,11 +1,13 @@
-const Service = require('./utils/Service');
-const Content = require('./utils/Content');
+const Content = require('../utils/Content');
+const Service = require('../utils/Service');
 
 //Editar y publicar nota
 //1 horas antes del partido
 
 export const handler = async (event: any) => {
-  console.log('lambda two received:', event);
+  console.log('Test lambda two:', event);
+
+  return;
 
   // verificar lo que llega en evenet
   // let con_id = event.con_id;

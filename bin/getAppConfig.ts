@@ -13,7 +13,7 @@ export function getAppConfig(): AppConfig {
   // Extract environment variables
   const envVars = {
     deploymentEnv: process.env.DEPLOYMENT_ENV!,
-    awsRegion: process.env.AWS_REGION!,
+    awsRegion: process.env.CDK_DEFAULT_REGION!,
     bucket: process.env.BUCKET!,
     mysqlHost: process.env.MYSQL_HOST!,
     mysqlUser: process.env.MYSQL_USER!,

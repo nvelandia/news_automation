@@ -1,8 +1,6 @@
-import { APIGatewayProxyEvent } from 'aws-lambda';
-
 // @ts-ignore
-const { getS3Info } = require('./utils/S3');
-const { tournament } = require('./utils/channels');
+const { getS3Info } = require('../utils/S3');
+const { tournament } = require('../utils/channels');
 const AWS = require('aws-sdk');
 
 interface Icountry {
@@ -10,12 +8,14 @@ interface Icountry {
   text: string;
 }
 
-export const handler = async (event: APIGatewayProxyEvent) => {
+export const handler = async (event: any) => {
   //
   const stepfunctions = new AWS.StepFunctions();
   let matchInfo = await getS3Info(event);
 
-  console.log('matchInfo', matchInfo);
+  console.log('Test', matchInfo);
+
+  // return;
 
   if (!matchInfo) {
     return;
@@ -33,7 +33,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
     input: JSON.stringify({
       match_id: matchInfo.match_id,
       match_start: matchInfo.match_start,
-      waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
+      waitTime1: calculateWaitTimes(matchInfo.match_start, 2),
       waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
       tournament: tournament,
     }),

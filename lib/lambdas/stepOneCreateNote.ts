@@ -1,5 +1,5 @@
-const Content = require('./utils/Content');
-const Service = require('./utils/Service');
+const Content = require('../utils/Content');
+const Service = require('../utils/Service');
 
 export const handler = async (event: any) => {
   console.log('lambda one', event);
@@ -8,14 +8,13 @@ export const handler = async (event: any) => {
 
   let matchInfo = await Service.getMatchById(event.match_id);
 
-  console.log('matchInfo', matchInfo);
-
   if (matchInfo) {
     // Info del mam
     let _Mam = JSON.parse(matchInfo.match_mam_json);
     let info = await Content.createContent(_Mam, event);
 
     if (info) {
+      return info;
       // Inserto un nuevo contenido
       let con_id = await Service.insert('tad_contenido', info.content);
       console.log('Nuevo Contenido', con_id);

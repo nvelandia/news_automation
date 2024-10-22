@@ -1,5 +1,5 @@
 // import { handler } from '../lib/lambdas/stepOneCreateNote/index';
-import { handler } from '../lib/lambdas/stepTwoPublishNote/index';
+import { handler } from '../lib/lambdas/stepTwoPublishNote';
 
 handler({
   match_id: 475318,
