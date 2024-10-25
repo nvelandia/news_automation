@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import { Runtime, Code } from 'aws-cdk-lib/aws-lambda';
+import { Runtime, Code, Function } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as path from 'path';
@@ -103,7 +103,7 @@ export class NewsAutomationStack extends cdk.Stack {
 
     const stepFunction = new sfn.StateMachine(this, 'StepFunction', {
       definition,
-      timeout: cdk.Duration.minutes(5),
+      timeout: cdk.Duration.hours(48),
     });
 
     // ----------

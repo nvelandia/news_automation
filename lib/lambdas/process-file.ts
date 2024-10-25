@@ -1,6 +1,7 @@
 // @ts-ignore
 const { getS3Info } = require('../utils/S3');
 const { tournament } = require('../utils/channels');
+const { Service } = require('../utils/Service');
 const AWS = require('aws-sdk');
 
 interface Icountry {
@@ -12,20 +13,21 @@ export const handler = async (event: any) => {
   //
   const stepfunctions = new AWS.StepFunctions();
   let matchInfo = await getS3Info(event);
+  console.log('matchInfo', matchInfo);
 
-  console.log('Test', matchInfo);
-
-  // return;
-
-  if (!matchInfo) {
-    return;
-  }
+  if (!matchInfo) return;
 
   let tournament = validateCompetition(matchInfo?.match_channel);
+  if (!tournament) return;
 
-  if (!tournament) {
-    return;
-  }
+  // // Validar si existe en df_match con el campo con_id_prev
+  // let matchFound = Service.getMatchById(matchInfo.match_id);
+
+  // if (matchFound.match_id) {
+  //   // si no existe, creo la nota
+  // } else {
+
+  // }
 
   // Parámetros para iniciar la Step Function
   const params = {
@@ -33,7 +35,7 @@ export const handler = async (event: any) => {
     input: JSON.stringify({
       match_id: matchInfo.match_id,
       match_start: matchInfo.match_start,
-      waitTime1: calculateWaitTimes(matchInfo.match_start, 2),
+      waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
       waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
       tournament: tournament,
     }),

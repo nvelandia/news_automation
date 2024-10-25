@@ -14,7 +14,6 @@ export const handler = async (event: any) => {
     let info = await Content.createContent(_Mam, event);
 
     if (info) {
-      return info;
       // Inserto un nuevo contenido
       let con_id = await Service.insert('tad_contenido', info.content);
       console.log('Nuevo Contenido', con_id);
@@ -31,7 +30,7 @@ export const handler = async (event: any) => {
         console.log('insertTerm', insertTerm);
       }
 
-      // info.match.con_id = con_id;
+      // info.match.con_id = con_id_prev;
       // console.log('info.match', info.match);
       // let updateMatch = await Service.updateMatch(info.match, event.match_id);
       // console.log('updateMatch', updateMatch);
