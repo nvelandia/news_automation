@@ -1,12 +1,11 @@
 const Content = require('../utils/Content');
 const Service = require('../utils/Service');
+const Php = require('../utils/Php');
 
-export const handler = async (event: any) => {
-  console.log('lambda one', event);
-  //Crear y publicar nota
-  //24 horas antes del partido
-
-  let matchInfo = await Service.getMatchById(event.match_id);
+export const handler = async (event: any, context: any) => {
+  //
+  let matchInfo = await Service.getMatchById(event.match_id, 'df_match');
+  const executionArn = context.invokedFunctionArn;
 
   if (matchInfo) {
     // Info del mam
@@ -30,13 +29,17 @@ export const handler = async (event: any) => {
         console.log('insertTerm', insertTerm);
       }
 
-      // info.match.con_id = con_id_prev;
-      // console.log('info.match', info.match);
-      // let updateMatch = await Service.updateMatch(info.match, event.match_id);
-      // console.log('updateMatch', updateMatch);
+      let df_match_prev = {
+        match_id: event.match_id,
+        con_id,
+        executionArn,
+      };
+
+      let updateMatch = await Service.updateMatchPrev(df_match_prev);
+      console.log('updateMatch', updateMatch);
 
       ////////////// PUBLICAR CONTENIDO ///////////////////
-      // await _Php.request(process.env.PUBLICATION_URL + con_id);
+      await Php.request(process.env.PUBLICATION_URL);
     } else {
       console.log('Error getMatchById');
     }

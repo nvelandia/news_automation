@@ -1,7 +1,7 @@
 // @ts-ignore
 const { getS3Info } = require('../utils/S3');
 const { tournament } = require('../utils/channels');
-const { Service } = require('../utils/Service');
+const Service = require('../utils/Service');
 const AWS = require('aws-sdk');
 
 interface Icountry {
@@ -13,47 +13,49 @@ export const handler = async (event: any) => {
   //
   const stepfunctions = new AWS.StepFunctions();
   let matchInfo = await getS3Info(event);
-  console.log('matchInfo', matchInfo);
 
   if (!matchInfo) return;
 
   let tournament = validateCompetition(matchInfo?.match_channel);
   if (!tournament) return;
 
-  // // Validar si existe en df_match con el campo con_id_prev
-  // let matchFound = Service.getMatchById(matchInfo.match_id);
+  let matchFound = await Service.getMatchById(
+    matchInfo.match_id,
+    'df_match_prev'
+  );
 
-  // if (matchFound.match_id) {
-  //   // si no existe, creo la nota
-  // } else {
+  if (!matchFound) {
+    // Parámetros para iniciar la Step Function
+    const params = {
+      stateMachineArn: process.env.STEP_FUNCTION_ARN, // ARN de la Step Function
+      input: JSON.stringify({
+        match_id: matchInfo.match_id,
+        match_start: matchInfo.match_start,
+        waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
+        waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
+        tournament: tournament,
+      }),
+    };
 
-  // }
-
-  // Parámetros para iniciar la Step Function
-  const params = {
-    stateMachineArn: process.env.STEP_FUNCTION_ARN, // ARN de la Step Function
-    input: JSON.stringify({
-      match_id: matchInfo.match_id,
-      match_start: matchInfo.match_start,
-      waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
-      waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
-      tournament: tournament,
-    }),
-  };
-
-  try {
-    // Disparar la ejecución de la Step Function
-    const data = await stepfunctions.startExecution(params).promise();
-    console.log('Ejecución de Step Function iniciada:', data);
+    try {
+      // Disparar la ejecución de la Step Function
+      const data = await stepfunctions.startExecution(params).promise();
+      console.log('Ejecución de Step Function iniciada:', data);
+      return {
+        statusCode: 200,
+        body: JSON.stringify('Ejecución de Step Function iniciada con éxito!'),
+      };
+    } catch (error) {
+      console.error('Error al iniciar Step Function:', error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify('Error al iniciar Step Function'),
+      };
+    }
+  } else {
     return {
       statusCode: 200,
-      body: JSON.stringify('Ejecución de Step Function iniciada con éxito!'),
-    };
-  } catch (error) {
-    console.error('Error al iniciar Step Function:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify('Error al iniciar Step Function'),
+      body: JSON.stringify('Previa del partido ya fue creada'),
     };
   }
 };
@@ -71,7 +73,6 @@ function validateCompetition(torneo: string) {
 }
 
 function calculateWaitTimes(match_start: string, time: number) {
-  // return `2024-10-02T18:${time}:00.000Z`;
   const originalDate = new Date(match_start);
 
   const hoursBefore = new Date(originalDate);

@@ -19,6 +19,7 @@ export function getAppConfig(): AppConfig {
     mysqlUser: process.env.MYSQL_USER!,
     mysqlPassword: process.env.MYSQL_PASSWORD!,
     mysqlDatabase: process.env.MYSQL_DATABASE!,
+    publicationUrl: process.env.PUBLICATION_URL!,
     vpc_id: process.env.VPC_ID!,
     security_group: process.env.SECURITY_GROUP!,
     subnetId1: process.env.SUBNET_ID1!,
