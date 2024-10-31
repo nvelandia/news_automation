@@ -39,7 +39,7 @@ export const handler = async (event: any, context: any) => {
       console.log('updateMatch', updateMatch);
 
       ////////////// PUBLICAR CONTENIDO ///////////////////
-      await Php.request(process.env.PUBLICATION_URL);
+      await Php.request(process.env.PUBLICATION_URL + con_id);
     } else {
       console.log('Error getMatchById');
     }

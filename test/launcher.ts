@@ -1,5 +1,5 @@
-// import { handler } from '../lib/lambdas/process-file';
-import { handler } from '../lib/lambdas/stepOneCreateNote';
+import { handler } from '../lib/lambdas/process-file';
+// import { handler } from '../lib/lambdas/stepOneCreateNote';
 // import { handler } from '../lib/lambdas/stepTwoPublishNote';
 
 handler(

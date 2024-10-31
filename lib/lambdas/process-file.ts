@@ -9,35 +9,38 @@ interface Icountry {
   text: string;
 }
 
-export const handler = async (event: any) => {
+export const handler = async (event: any, context: any) => {
   //
+  const snsMessage = event.Records[0].Sns.Message;
+  const s3Event = JSON.parse(snsMessage);
+
   const stepfunctions = new AWS.StepFunctions();
-  let matchInfo = await getS3Info(event);
+  let matchInfo = await getS3Info(s3Event);
 
-  if (!matchInfo) return;
+  try {
+    if (!matchInfo) return;
 
-  let tournament = validateCompetition(matchInfo?.match_channel);
-  if (!tournament) return;
+    let tournament = validateCompetition(matchInfo?.match_channel);
+    if (!tournament) return;
 
-  let matchFound = await Service.getMatchById(
-    matchInfo.match_id,
-    'df_match_prev'
-  );
+    let matchFound = await Service.getMatchById(
+      matchInfo.match_id,
+      'df_match_prev'
+    );
 
-  if (!matchFound) {
-    // Parámetros para iniciar la Step Function
-    const params = {
-      stateMachineArn: process.env.STEP_FUNCTION_ARN, // ARN de la Step Function
-      input: JSON.stringify({
-        match_id: matchInfo.match_id,
-        match_start: matchInfo.match_start,
-        waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
-        waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
-        tournament: tournament,
-      }),
-    };
+    if (!matchFound) {
+      // Parámetros para iniciar la Step Function
+      const params = {
+        stateMachineArn: process.env.STEP_FUNCTION_ARN,
+        input: JSON.stringify({
+          match_id: matchInfo.match_id,
+          match_start: matchInfo.match_start,
+          waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
+          waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
+          tournament: tournament,
+        }),
+      };
 
-    try {
       // Disparar la ejecución de la Step Function
       const data = await stepfunctions.startExecution(params).promise();
       console.log('Ejecución de Step Function iniciada:', data);
@@ -45,17 +48,17 @@ export const handler = async (event: any) => {
         statusCode: 200,
         body: JSON.stringify('Ejecución de Step Function iniciada con éxito!'),
       };
-    } catch (error) {
-      console.error('Error al iniciar Step Function:', error);
+    } else {
       return {
-        statusCode: 500,
-        body: JSON.stringify('Error al iniciar Step Function'),
+        statusCode: 200,
+        body: JSON.stringify('Previa del partido ya fue creada'),
       };
     }
-  } else {
+  } catch (error) {
+    console.error('Error al iniciar Step Function:', error);
     return {
-      statusCode: 200,
-      body: JSON.stringify('Previa del partido ya fue creada'),
+      statusCode: 500,
+      body: JSON.stringify('Error al iniciar Step Function'),
     };
   }
 };
