@@ -35,7 +35,7 @@ export const handler = async (event: any, context: any) => {
         input: JSON.stringify({
           match_id: matchInfo.match_id,
           match_start: matchInfo.match_start,
-          waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
+          waitTime1: calculateWaitTimes(matchInfo.match_start, 2),
           waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
           tournament: tournament,
         }),
@@ -76,15 +76,8 @@ function validateCompetition(torneo: string) {
 }
 
 function calculateWaitTimes(match_start: string, time: number) {
-  const originalDate = new Date(match_start);
+  const localDate = new Date(match_start.replace(' ', 'T') + '-03:00');
+  localDate.setHours(localDate.getHours() - time);
 
-  const hoursBefore = new Date(originalDate);
-  hoursBefore.setHours(originalDate.getHours() - time);
-
-  const targetDate = new Date(hoursBefore);
-  const timestamp = targetDate.getTime();
-
-  console.log(match_start, ` ${time} `, hoursBefore, ' ', timestamp);
-
-  return hoursBefore;
+  return localDate.toISOString();
 }
