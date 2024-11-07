@@ -6,8 +6,6 @@ const Php = require('../utils/Php');
 //1 horas antes del partido
 
 export const handler = async (event: any) => {
-  console.log('Test lambda two:', event);
-
   // verificar lo que llega en evenet
   let con_id = `${event.con_id}`;
 
@@ -17,6 +15,7 @@ export const handler = async (event: any) => {
       let content = await Content.modifyContent(info, event);
 
       let res = await Service.update(content, con_id);
+      console.log('update contenido', res);
 
       ////////////// PUBLICAR CONTENIDO ///////////////////
       await Php.request(

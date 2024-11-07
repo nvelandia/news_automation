@@ -74,6 +74,7 @@ export class NewsAutomationStack extends cdk.Stack {
         MYSQL_USER: process.env.MYSQL_USER || '',
         MYSQL_PASSWORD: process.env.MYSQL_PASSWORD || '',
         MYSQL_DATABASE: process.env.MYSQL_DATABASE || '',
+        PUBLICATION_URL: process.env.PUBLICATION_URL || '',
       },
     });
 
@@ -99,10 +100,12 @@ export class NewsAutomationStack extends cdk.Stack {
       outputPath: '$.Payload',
     });
 
-    const definition = waitTime1
-      .next(oneLambdaTask)
-      .next(waitTime2)
-      .next(twoLambdaTask);
+    // const definition = waitTime1
+    //   .next(oneLambdaTask)
+    //   .next(waitTime2)
+    //   .next(twoLambdaTask);
+
+    const definition = oneLambdaTask.next(twoLambdaTask);
 
     const stepFunction = new sfn.StateMachine(this, 'StepFunction', {
       definition,

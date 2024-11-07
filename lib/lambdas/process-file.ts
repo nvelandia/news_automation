@@ -18,10 +18,16 @@ export const handler = async (event: any, context: any) => {
   let matchInfo = await getS3Info(s3Event);
 
   try {
-    if (!matchInfo) return;
+    if (!matchInfo) {
+      console.log('MatchInfo invalid');
+      return;
+    }
 
     let tournament = validateCompetition(matchInfo?.match_channel);
-    if (!tournament) return;
+    if (!tournament) {
+      console.log('Tournament invalid');
+      return;
+    }
 
     let matchFound = await Service.getMatchById(
       matchInfo.match_id,
@@ -49,10 +55,8 @@ export const handler = async (event: any, context: any) => {
         body: JSON.stringify('Ejecución de Step Function iniciada con éxito!'),
       };
     } else {
-      return {
-        statusCode: 200,
-        body: JSON.stringify('Previa del partido ya fue creada'),
-      };
+      console.log('Previa del partido ya fue creada');
+      return;
     }
   } catch (error) {
     console.error('Error al iniciar Step Function:', error);
@@ -69,7 +73,7 @@ function validateCompetition(torneo: string) {
   );
 
   if (result) {
-    return { name: result.name, text: result.text };
+    return result;
   } else {
     return false;
   }
