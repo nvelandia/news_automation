@@ -9,16 +9,25 @@ export const handler = async (event: any) => {
   console.log('Test lambda two:', event);
 
   // verificar lo que llega en evenet
-  let con_id = event.con_id;
+  let con_id = `${event.con_id}`;
 
-  if (con_id) {
-    let info = await Service.getContenidoById(con_id);
-    let content = await Content.modifyContent(info, event);
+  try {
+    if (con_id) {
+      let info = await Service.getContenidoById(con_id);
+      let content = await Content.modifyContent(info, event);
 
-    let res = await Service.update(content, con_id);
+      let res = await Service.update(content, con_id);
 
-    ////////////// PUBLICAR CONTENIDO ///////////////////
-    await Php.request(process.env.PUBLICATION_URL + con_id);
+      ////////////// PUBLICAR CONTENIDO ///////////////////
+      await Php.request(
+        process.env.PUBLICATION_URL + con_id + '_' + event?.tournament?.mul_id
+      );
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify(error),
+    };
   }
 
   return { message: 'End' };
