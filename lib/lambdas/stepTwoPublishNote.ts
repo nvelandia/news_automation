@@ -19,7 +19,7 @@ export const handler = async (event: any) => {
 
       ////////////// PUBLICAR CONTENIDO ///////////////////
       await Php.request(
-        process.env.PUBLICATION_URL + con_id + '_' + event?.tournament?.mul_id
+        process.env.PUBLICATION_URL + con_id + '/' + event?.tournament?.mul_id
       );
     }
   } catch (error) {

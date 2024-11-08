@@ -41,7 +41,7 @@ export const handler = async (event: any, context: any) => {
         input: JSON.stringify({
           match_id: matchInfo.match_id,
           match_start: matchInfo.match_start,
-          waitTime1: calculateWaitTimes(matchInfo.match_start, 2),
+          waitTime1: calculateWaitTimes(matchInfo.match_start, 24),
           waitTime2: calculateWaitTimes(matchInfo.match_start, 1),
           tournament: tournament,
         }),
